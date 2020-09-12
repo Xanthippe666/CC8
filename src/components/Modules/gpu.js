@@ -14,16 +14,20 @@ class gpu {
     this.ctx = this.canvas.getContext('2d')
     // this.ctx.globalCompositeOperation = 'sourcein';
     this._layerOne = this.ctx.createImageData(this.xsize, this.ysize)
+    this.clearScreen()
+
+  }
+
+  clearScreen(){
     for (let i = 0 ; i < this._layerOne.data.length; i += 4){
       this._layerOne.data[i + 0] = 0
       this._layerOne.data[i + 1] = 0
       this._layerOne.data[i + 2] = 0
       this._layerOne.data[i + 3] = 255
     }
-
-
   }
 
+  // this._layerOne (a VRAM) -->  bitmap --> renderedImage
   render(timestamp){
     // for (let i = 0; i < this.vramSize; i += 4){
     //   this._layerOne.data[i + 0] = this.vram[i + 0]
@@ -78,3 +82,4 @@ class gpu {
 }
 
 export default new gpu()
+// module.exports = gpu

@@ -29,6 +29,7 @@
 
 <script>
 import GPU from './Modules/gpu.js'
+import opcodeDecoder from './Modules/opcodeDecoder.js'
 
 export default {
   name: 'CLI',
@@ -101,7 +102,8 @@ export default {
       if (this.commandHistory.length > 10){
         this.commandHistory.pop()
       }
-      this.commandHistory.unshift(value)
+      let opcode = opcodeDecoder.parse(value)
+      this.commandHistory.unshift(value + '  --》  ' + opcode)
       event.target.value = '' // clear it
     },
 
@@ -114,12 +116,14 @@ export default {
 <style lang="less" scoped>
 div#body{
   @debugBorder: 0;//0.2cm groove orange;
-
+  @cliWidth: 55%;
 
   div#gui{
     position: relative;
     margin-top: 0%;
     canvas#screen{
+      width: 50%;
+      height: 50%;
       background-color: green;
     }
   }
@@ -131,7 +135,7 @@ div#body{
     div#cliBar{
       position: relative;
       border: @debugBorder;
-      width: 35%;
+      width: @cliWidth;
       .commandTag{
         position: relative;
         // border: @debugBorder;
@@ -142,7 +146,7 @@ div#body{
         position: relative;
         border: @debugBorder;
         @media screen and (max-width: 399px){
-          font-size: 10px;
+          font-size: 8px;
           width: 50%;
         }
         @media screen and (min-width: 400px) and (max-width: 599px){
@@ -162,7 +166,7 @@ div#body{
       position: relative;
       margin: 0 0 0 0;
       border: @debugBorder;
-      width: 35%;
+      width: @cliWidth;
                   // margin-left: 10%;
       text-align: left;
       div{

@@ -1,3 +1,48 @@
+function concatTypedArray(array1, array2){
+  // console.log(array1, array2)
+  let result = new Uint8Array(array1.length + array2.length)
+  result.set(array1, 0)
+  result.set(array2, array1.length)
+  return result
+}
 
+// loadROM is a callback (event handler) and calls callback(program)
+const fileLoader = {
+  loadROM: function(event, callback = null){
 
-module.exports = {a:1, b:2}
+    let base = './static/testRoms/'
+    let file = base + event.target.value
+    console.log(file)
+    var myInit = { method: 'GET',
+                   headers: {
+                       'Content-Type': 'application/octet-stream'
+                   },
+                   mode: 'cors',
+                   cache: 'default' };
+    var myRequest = new Request(file, myInit);
+    let reader
+    let program = []
+    fetch(myRequest)
+      .then((res) => {
+        console.log(res.body)
+        reader = res.body.getReader()
+        return reader.read()
+      })
+      .then(function processText({done, value}){
+
+        if (done){
+          console.log('read complete')
+          console.log(program)
+          return callback(program)
+        }
+
+        program = concatTypedArray(program, value)
+
+        return reader.read().then(processText)
+
+      })
+      .catch(console.log.bind(console))
+  },
+}
+
+module.exports = fileLoader
