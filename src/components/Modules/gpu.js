@@ -1,5 +1,10 @@
 class gpu {
 
+  adjustWindowSize(width, height){
+    this.canvas.width = Math.ceil(width)
+    this.canvas.height = Math.ceil(height)
+  }
+
   configure(canvas, options){
     this.canvas = canvas
     this.canvas.width = Math.ceil(options.canvasWidth)
@@ -36,6 +41,10 @@ class gpu {
     //   this._layerOne.data[i + 3] = 255
     // }
     // let that = this
+    // console.log(timestamp)
+    // console.log(1000/(timestamp - this.oldTime))
+    this.fps = 1000/(timestamp - this.oldTime)
+    this.oldTime = timestamp
 
     Promise.all([
       createImageBitmap(this._layerOne, {
@@ -48,13 +57,15 @@ class gpu {
     ]).then(function(bitmaps){
       // this.ctx.putImageData(this._imageData, 0, 0)
 
-      this.ctx.save()
-      this.ctx.fillStyle = '#ff6';
-      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-      this.ctx.restore()
+      //
+      // this.ctx.save()
+      // this.ctx.fillStyle = '#ff6';
+      // this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      // this.ctx.restore()
+      // this._layerOne.data[32]++
 
       this.ctx.drawImage(bitmaps[0], 0, 0)
-      this._layerOne.data[32]++
+
       requestAnimationFrame(this.render.bind(this))
     }.bind(this))
 

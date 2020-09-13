@@ -64,7 +64,7 @@ export default {
 
 <style scoped lang='less'>
   @debugBorder: 00.2cm groove orange;
-  @cliWidth: 33%;
+  @cliWidth: 46%;
 
 
   div#cli{
@@ -74,6 +74,7 @@ export default {
       width: @cliWidth;
       td, th, tr{
         border: 0.1cm groove black;
+        font-size: 20px;
       }
     }
 
@@ -87,7 +88,9 @@ export default {
       float: left;
       div{
         position:relative;
+                font-size: 20px;
         .command{
+
         }
         .commandTag{
           color: blue;

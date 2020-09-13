@@ -22,6 +22,14 @@
         <option value="opel">Opel</option>
         <option value="audi">Audi</option>
       </select>
+
+       <label for="">scale</label>
+      <input type="range" v-model="canvasScale" value="80"
+            v-on:change="processWindowAdjust">{{canvasScale/100}}
+
+     <input type="button" value="oneCycle" v-on:click="oneCycle">
+      <input type="button" value="continue" v-on:click="startEmulation">
+      <input type="button" value="pause" v-on:click="stopEmulation">
     </div>
 
     <div id="controls">
@@ -67,10 +75,13 @@ export default {
   data () {
     return {
       // visuals
-      canvasScale: 1.5,
+      canvasScale: 80, // out of 100
+      screenX: 64,
+      screenY: 32,
 
       // chip-8 emulator
       chip8: null,
+      clock: null,
 
       // for I/O
       地图: {
@@ -91,50 +102,65 @@ export default {
     const canvasEl = document.getElementById('screen')
     let winW = window.innerWidth
     let winH = window.innerHeight
-    let minWin = Math.min(winW, winH)
+    let minWin = window.innerWidth // Math.sqrt(winW*winH)
 
-    let canvasWidth = minWin * 0.64 * this.canvasScale
-    let canvasHeight = minWin * 0.32 * this.canvasScale
+    let canvasWidth = minWin * this.canvasScale / 100
+    let canvasHeight = minWin * this.screenY /this.screenX * this.canvasScale/100
     this.chip8.configureGPU(canvasEl, {
       canvasWidth: canvasWidth,
       canvasHeight: canvasHeight,
-      xsize: 64,
-      ysize: 32,
+      xsize: this.screenX,
+      ysize: this.screenY,
     })
     this.chip8.configureCPU({
       clockSpeed: 540, //Hz, meaning 540 / 60 = 9 instructions per 1/60 seconds
       ramSize: 4096, // 4kB of RAM
-
     })
-
     this.chip8.initSystem()
-    this.chip8.restartSystem()
 
-    setInterval(function(){
-      let randomX = Math.floor(Math.random()*64)
-      let randomY = Math.floor(Math.random()*32)
-      let randomR = Math.floor(Math.random()*256)
-      let randomG = Math.floor(Math.random()*256)
-      let randomB = Math.floor(Math.random()*256)
-      this.chip8.gpu.setPixel(randomX, randomY,randomR,randomG,randomB  )
-      this.chip8.cpu.PC++
-      let fakeOpcode = 'ADD V1 V3'
-
-      // debugging
-      this.updateDebuggerOneTick(fakeOpcode)
-    }.bind(this), 1000 / 60)
+    this.chip8.configClock({
+      debug: true,
+      clockingInterval: 1000,  // 1000 / 60
+      updateDebuggerOneTick: this.updateDebuggerOneTick.bind(this),
+    })
 
     // 设置 输入
     window.onkeydown = this.processInputFromKeyboard
-
+    window.onresize = this.processWindowAdjust
   },
   methods: {
     // load ROM I/O
     loadROM: function(e){
-      fileLoader.loadROM(e, function(arr){
+      fileLoader.loadROM(e, (arr) => {
+        // restart the system but keep the GPU running
         this.chip8.restartSystem()
         this.chip8.loadProgramIntoRam(arr)
-      }.bind(this))
+        this.clearDebugInfo()
+
+        // where to start program
+        this.chip8.startCPUProgramOn(0x200)
+
+        // this.startEmulation()
+
+      })
+    },
+    oneCycle: function(){
+      this.chip8.processOneCycle()
+    },
+    stopEmulation: function(){
+      this.chip8.stopClock()
+    },
+    startEmulation: function(){
+      this.chip8.startClock({
+        debug: true,
+        clockingInterval: 1000,  // 1000 / 60
+        updateDebuggerOneTick: this.updateDebuggerOneTick.bind(this),
+      })
+    },
+    clearDebugInfo: function(){
+      // 调试
+      this.chip8OpcodeHistory =  []
+      this.chip8InternalDebugData =  {}
     },
     // keyboard input I/O
     processInputFromKeyboard: function(e){
@@ -152,9 +178,20 @@ export default {
       if (this.chip8OpcodeHistory.length > 100){
         this.chip8OpcodeHistory.pop()
       }
-      this.chip8OpcodeHistory.unshift(opcode)
+      this.chip8OpcodeHistory.unshift(this.chip8.currentOpcode)
 
       this.chip8InternalDebugData = this.chip8.getCPUDebugParameters()
+    },
+    processWindowAdjust: function(e){
+      // let winW = window.innerWidth
+      // let winH = window.innerHeight
+      let minWin = window.innerWidth // Math.sqrt(winW*winH)
+
+      let canvasWidth = minWin * this.canvasScale / 100
+      let canvasHeight = minWin * this.screenY /this.screenX * this.canvasScale / 100
+      // console.log(canvasWidth, canvasHeight)
+      this.chip8.onWindowResize(canvasWidth, canvasHeight)
+      return {canvasWidth: canvasWidth, canvasHeight: canvasHeight}
     }
 
   },
@@ -176,6 +213,9 @@ div#body{
 
   div#ROMS{
     position: relative;
+    input{
+      font-size: 20px;
+    }
   }
 
   div#controls{

@@ -12,16 +12,22 @@ class cpu {
   reset(){
     // 16 8-bit registers
     this.V = new Uint8Array(16)
-    
+
     this.I = new Uint16Array(1)
-    
+
     // Delay and sound timer registers
-    this.DELAY = new Uint8Array(1)
-    this.SOUND = new Uint8Array(1)
-    
+    this.DELAY = new Uint8ClampedArray(1)
+    this.SOUND = new Uint8ClampedArray(1)
+
     this.PC = new Uint16Array(1)
     this.SP = new Uint8Array(1)
     this.stack = new Uint16Array(16)
+
+  }
+
+  startCPUProgramOn(address){
+    this.PC[0] = 0x200
+    this.SP[0] = 0
   }
 
   configure(options){
@@ -39,6 +45,17 @@ class cpu {
     this.SP = 0x00
   }
 
+  loadFromMem(address){
+    return this.RAM.loadFromMem(address)
+  }
+
+  storeToMem(address, value){
+    this.RAM.storeToMem(address, value)
+  }
+
+  DMA(arr, offset){
+    this.RAM.DMA(arr, offset)
+  }
 
 
 }
