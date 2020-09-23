@@ -64,14 +64,14 @@ export default {
 
 <style scoped lang='less'>
   @debugBorder: 00.2cm groove orange;
-  @cliWidth: 46%;
-
+  @cliWidth: 60%;
+  @tableWidth: 33%;
 
   div#cli{
     float:left;
     table#internalRegs{
       position:relative;
-      width: @cliWidth;
+      width: @tableWidth;
       td, th, tr{
         border: 0.1cm groove black;
         font-size: 20px;

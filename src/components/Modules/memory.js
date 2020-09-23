@@ -15,7 +15,9 @@ class memory {
       this.RAM[i] = 0x00
     }
   }
-
+  getMemoryChunk(address, bytes){
+    return this.RAM.subarray(address, address + bytes)
+  }
   loadFromMem(address){
     return this.RAM[address]
   }

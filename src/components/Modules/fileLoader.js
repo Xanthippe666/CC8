@@ -8,10 +8,14 @@ function concatTypedArray(array1, array2){
 
 // loadROM is a callback (event handler) and calls callback(program)
 const fileLoader = {
-  loadROM: function(event, callback = null){
-
-    let base = './static/testRoms/'
-    let file = base + event.target.value
+  loadROM: function(e, callback = null){
+    let base = './static/'
+    let file
+    if (e.target === undefined){
+      file = base + e
+    } else {
+      file = base + e.target.value
+    }
     console.log(file)
     var myInit = { method: 'GET',
                    headers: {

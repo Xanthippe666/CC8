@@ -15,18 +15,28 @@ class cpu {
 
     this.I = new Uint16Array(1)
 
-    // Delay and sound timer registers
-    this.DELAY = new Uint8ClampedArray(1)
-    this.SOUND = new Uint8ClampedArray(1)
-
     this.PC = new Uint16Array(1)
     this.SP = new Uint8Array(1)
     this.stack = new Uint16Array(16)
 
   }
+  popStack(){
+    if (this.SP[0] <= 0){
+      return Error('cannot pop stack with no elements')
+    }
+    this.SP[0]--
+    return this.stack[this.SP[0]]
+  }
+  pushStack(val){
+    if (this.SP[0] >= this.stack.length - 1){
+      return Error('cannot push stack with full stack')
+    }
+    this.stack[this.SP[0]] = val & 0xFFFF
+    this.SP[0]++
+  }
 
   startCPUProgramOn(address){
-    this.PC[0] = 0x200
+    this.PC[0] = address
     this.SP[0] = 0
   }
 
@@ -39,8 +49,8 @@ class cpu {
       this.V[i] = 0x00
     }
     this.I = 0x0000
-    this.DELAY = 0x00
-    this.SOUND = 0x00
+    // this.DELAY = 0x00
+    // this.SOUND = 0x00
     this.PC = 0x0000 // ?? 入口在哪？
     this.SP = 0x00
   }
