@@ -12,4 +12,4 @@ Chip8 的模拟实现。使用HTML+JS+Webpack+Vue的技术栈.
 - run `npm install` and `npm start` to develop and debug （跑以下的命令进行开发）
 
 ## How to use as an user
-- demo is live at [chip8 demo](Xanthippe666.github.io/chip8.html) （在此网站，可试用）
+- demo is live at [chip8 demo](http://Xanthippe666.github.io/CHIP8.html) （在此网站，可试用）
